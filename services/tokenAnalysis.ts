@@ -3,6 +3,24 @@ import { solanaRpcService } from "./solanaRpcService";
 import { externalApisService } from "./externalApis";
 import { TokenAnalysis } from "./types";
 
+/**
+ * ZenCheck Risk Score Algorithm — True Rug-Pull Detection
+ *
+ * This algorithm ONLY evaluates on-chain security factors that indicate
+ * whether a token could be a rug-pull. It does NOT penalize for:
+ *   - Price drops / negative price change
+ *   - Low market cap (small tokens can be safe)
+ *   - Low volume
+ *
+ * Risk factors checked (inspired by rugcheck.xyz):
+ *   1. Mint Authority (can they print more tokens?)
+ *   2. Freeze Authority (can they freeze your wallet?)
+ *   3. Update Authority (can they change the contract?)
+ *   4. LP Status (burned > locked > unlocked)
+ *   5. Liquidity depth (is there enough to sell?)
+ *   6. Top Holder concentration (insider whale risk)
+ *   7. Liq/MCap ratio (rug-pull liquidity warning)
+ */
 export const tokenAnalysisService = {
   async analyzeToken(
     address: string,
@@ -22,41 +40,61 @@ export const tokenAnalysisService = {
       externalApisService.getMarketData(address),
     ]);
 
-    // 4. Calculate Risk Score based on real data
+    // 4. Calculate Risk Score — ONLY on-chain rug indicators
     let riskScore = 100;
 
-    // Authority checks (higher penalty for active authorities)
-    // Blue-Chip Safeguard: Massive established tokens often have active multisig authorities or dynamic LPs (like Meteora DLMMs)
-    // If Market Cap > $50M and Liquidity > $2M, they are highly unlikely to be standard rugpulls.
+    // Blue-Chip Safeguard: Massive established tokens (SOL, BONK, JUP, etc.)
+    // with large market caps and deep liquidity are NOT standard rugpulls
     const isBlueChip =
       marketData.marketCap > 50_000_000 && marketData.liquidityUsd > 2_000_000;
 
     if (!isBlueChip) {
-      if (rpcData.mintAuthority === "active") riskScore -= 20;
-      if (rpcData.freezeAuthority === "active") riskScore -= 15;
+      // === AUTHORITY CHECKS (Most critical for rug detection) ===
+      // Mint Authority: Can the dev print unlimited tokens and dump?
+      if (rpcData.mintAuthority === "active") riskScore -= 25;
+
+      // Freeze Authority: Can the dev freeze your wallet so you can't sell?
+      if (rpcData.freezeAuthority === "active") riskScore -= 20;
+
+      // Update Authority: Can the dev change the token contract?
       if (rpcData.updateAuthority === "active") riskScore -= 10;
 
-      // Liquidity checks
+      // === LP STATUS (Second most critical) ===
+      // Unlocked LP = dev can pull liquidity at any time (classic rug)
       if (marketData.lpStatus === "unlocked") riskScore -= 25;
+      // Locked LP = safer but can still expire
       else if (marketData.lpStatus === "locked") riskScore -= 5;
-      // burned = no penalty
+      // Burned LP = no penalty, liquidity is permanent
 
-      if (marketData.liquidityUsd < 1000) riskScore -= 15;
-      else if (marketData.liquidityUsd < 10000) riskScore -= 10;
-      else if (marketData.liquidityUsd < 50000) riskScore -= 5;
+      // === LIQUIDITY DEPTH CHECK ===
+      // Very low liquidity means even small sells cause massive slippage
+      // This is NOT a price penalty — it's a "can you actually sell" check
+      if (marketData.liquidityUsd < 500) riskScore -= 10;
+      else if (marketData.liquidityUsd < 5000) riskScore -= 5;
 
-      // Market cap check
-      if (marketData.marketCap < 10000) riskScore -= 5;
+      // === TOP HOLDER CONCENTRATION ===
+      // High concentration = insider can dump and crash the token
+      if (holders.length > 0) {
+        const topHolder = holders[0];
+        if (topHolder.percentage > 50) riskScore -= 15;
+        else if (topHolder.percentage > 30) riskScore -= 10;
+        else if (topHolder.percentage > 15) riskScore -= 5;
 
-      // Top holder concentration check
-      if (holders[0] && holders[0].percentage > 50) riskScore -= 15;
-      else if (holders[0] && holders[0].percentage > 20) riskScore -= 10;
-      else if (holders[0] && holders[0].percentage > 10) riskScore -= 5;
+        // Check total concentration of top 5 holders
+        const top5Total = holders
+          .slice(0, 5)
+          .reduce((sum, h) => sum + h.percentage, 0);
+        if (top5Total > 80) riskScore -= 10;
+        else if (top5Total > 60) riskScore -= 5;
+      }
 
-      // Liq/MCap ratio (too low = risky)
-      if (marketData.liqMcapRatio < 1) riskScore -= 5;
+      // === LIQ/MCAP RATIO ===
+      // Very low ratio means liquidity is thin relative to market cap
+      // This is a structural vulnerability, not a price indicator
+      if (marketData.liqMcapRatio < 0.5 && marketData.marketCap > 0)
+        riskScore -= 5;
     } else {
-      // Blue chips get a 95-100 score minimum
+      // Blue chips get a guaranteed safe score
       riskScore = 100;
     }
 

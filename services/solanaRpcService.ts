@@ -42,10 +42,9 @@ export const solanaRpcService = {
             info.freezeAuthority === "11111111111111111111111111111111"
               ? "revoked"
               : "active",
-          updateAuthority:
-            info.mintAuthority === null && info.freezeAuthority === null
-              ? "revoked"
-              : "active",
+          // Update Authority: Derive from whether the token is mutable
+          // If mint authority is still active, the contract is effectively updatable
+          updateAuthority: info.mintAuthority === null ? "revoked" : "active",
           decimals,
           totalSupply,
         };
@@ -71,7 +70,7 @@ export const solanaRpcService = {
       const largestAccounts = await connection.getTokenLargestAccounts(pubkey);
 
       if (largestAccounts.value && Array.isArray(largestAccounts.value)) {
-        const accounts = largestAccounts.value.slice(0, 5);
+        const accounts = largestAccounts.value.slice(0, 20);
         const supplyInfo = await connection.getTokenSupply(pubkey);
         const totalAmount = supplyInfo.value.uiAmount || 1;
 
