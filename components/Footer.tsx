@@ -176,6 +176,24 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+
+            {/* Legal Links */}
+            <div className="flex flex-wrap items-center gap-3 pt-5 mt-2 border-t border-border-dark/30">
+              <a
+                href="/privacy"
+                className="relative overflow-hidden px-4 py-2 rounded-xl text-xs font-medium text-text-muted transition-all duration-300 hover:text-text-primary group border border-transparent hover:border-primary/30 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] bg-surface-dark/30 hover:bg-surface-dark"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent opacity-0 translate-x-[-100%] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 will-change-transform"></div>
+                <span className="relative z-10">Privacy Policy</span>
+              </a>
+              <a
+                href="/terms"
+                className="relative overflow-hidden px-4 py-2 rounded-xl text-xs font-medium text-text-muted transition-all duration-300 hover:text-text-primary group border border-transparent hover:border-primary/30 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] bg-surface-dark/30 hover:bg-surface-dark"
+              >
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/10 via-primary/5 to-transparent opacity-0 translate-x-[-100%] group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 will-change-transform"></div>
+                <span className="relative z-10">Terms of Service</span>
+              </a>
+            </div>
           </div>
         </div>
 
