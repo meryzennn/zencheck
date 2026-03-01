@@ -1,9 +1,9 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 
 // Real Solana RPC implementation for token authorities
-// Uses Solana public mainnet RPC, or Helius if env is set
+// Uses Solana public mainnet RPC, or Alchemy if env is set
 const rpcUrl =
-  process.env.HELIUS_RPC_URL || "https://api.mainnet-beta.solana.com";
+  process.env.ALCHEMY_RPC_URL || "https://api.mainnet-beta.solana.com";
 const connection = new Connection(rpcUrl, "confirmed");
 
 interface SolanaAccountInfo {
@@ -85,6 +85,7 @@ export const solanaRpcService = {
           return {
             rank: index + 1,
             address: `${account.address.toString().slice(0, 4)}...${account.address.toString().slice(-4)}`,
+            rawAddress: account.address.toString(),
             quantity,
             percentage,
             tag: percentage > 20 ? "WHALE ALERT" : undefined,

@@ -54,14 +54,14 @@ export default function TokenPage({
       fetchToken(false);
     }, 10000);
 
-    // Set up Helius WebSocket for instant on-chain contract changes (Mint/Freeze authority)
+    // Set up Alchemy WebSocket for instant on-chain contract changes (Mint/Freeze authority)
     let subscriptionId: number | null = null;
     let connection: Connection | null = null;
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
+      const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
       const wssUrl = apiKey
-        ? `wss://mainnet.helius-rpc.com/?api-key=${apiKey}`
+        ? `wss://solana-mainnet.g.alchemy.com/v2/${apiKey}`
         : "wss://api.mainnet-beta.solana.com";
 
       connection = new Connection(wssUrl, "confirmed");
@@ -348,7 +348,18 @@ export default function TokenPage({
                           #{holder.rank}
                         </td>
                         <td className="py-3 pr-4 text-white font-mono text-xs">
-                          {holder.address}
+                          <a
+                            href={`https://solscan.io/account/${holder.rawAddress}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-primary hover:underline transition-colors flex items-center gap-1"
+                            title={`View wallet ${holder.rawAddress} on Solscan`}
+                          >
+                            {holder.address}
+                            <span className="material-symbols-outlined text-[10px] opacity-70">
+                              open_in_new
+                            </span>
+                          </a>
                         </td>
                         <td className="py-3 pr-4 text-text-secondary hidden sm:table-cell">
                           {formatNumber(holder.quantity)}
@@ -524,13 +535,26 @@ export default function TokenPage({
 
           {/* Real-Time Activity */}
           <GlassPanel className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-primary text-lg">
-                electric_bolt
-              </span>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Real-Time Activity
-              </h3>
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-lg">
+                  electric_bolt
+                </span>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  Real-Time Activity
+                </h3>
+              </div>
+              <a
+                href={`https://solscan.io/token/${token.address}#transfers`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-bold text-secondary bg-secondary/10 hover:bg-secondary/20 transition-colors px-2.5 py-1 rounded-full border border-secondary/20 flex items-center gap-1"
+              >
+                Live Trades
+                <span className="material-symbols-outlined text-[12px]">
+                  open_in_new
+                </span>
+              </a>
             </div>
             <div className="flex flex-col gap-3">
               {token.recentActivity.map((activity, i) => (

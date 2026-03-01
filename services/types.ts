@@ -23,6 +23,7 @@ export interface TokenAnalysis {
   topHolders: {
     rank: number;
     address: string;
+    rawAddress: string;
     quantity: number;
     percentage: number;
     tag?: string;
