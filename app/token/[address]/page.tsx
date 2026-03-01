@@ -166,16 +166,18 @@ export default function TokenPage({
             )}
 
             <div
-              className={`p-6 ${token.bannerUrl ? "-mt-16 relative z-10" : ""}`}
+              className={`p-6 md:p-8 ${token.bannerUrl ? "-mt-16 md:-mt-24 relative z-10" : ""}`}
             >
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                {/* Left Side: Logo & Text */}
                 <div className="flex-1">
-                  <div className="flex items-end gap-4 mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-end gap-4 mb-2">
+                    {/* Logo */}
                     {token.logoUrl ? (
                       <img
                         src={token.logoUrl}
                         alt={`${token.name} logo`}
-                        className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover ring-4 ring-background shadow-xl bg-surface-dark"
+                        className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover ring-4 ring-background shadow-xl bg-surface-dark shrink-0"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = "none";
@@ -186,26 +188,27 @@ export default function TokenPage({
                       />
                     ) : null}
                     <div
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black text-2xl ring-4 ring-background shadow-xl"
+                      className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black text-2xl ring-4 ring-background shadow-xl shrink-0"
                       style={{ display: token.logoUrl ? "none" : "flex" }}
                     >
                       {token.symbol?.[0] || "?"}
                     </div>
-                    <div className="mb-1">
-                      <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md flex items-center gap-2">
+
+                    {/* Token Text & Copy */}
+                    <div className="mb-1 mt-3 sm:mt-0">
+                      <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md flex items-center gap-2 flex-wrap">
                         {token.name}{" "}
                         <span className="text-text-secondary text-lg font-medium bg-surface-dark/50 px-2 rounded">
                           {token.symbol}
                         </span>
                       </h1>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-text-muted font-mono text-xs bg-surface-dark/80 px-2 py-1 rounded border border-white/5">
-                          {token.address.slice(0, 8)}...
-                          {token.address.slice(-6)}
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
+                        <span className="text-text-muted font-mono text-xs bg-surface-dark/80 px-2 py-1 rounded border border-white/5 truncate max-w-[200px] sm:max-w-none">
+                          {token.address}
                         </span>
                         <button
                           onClick={copyAddress}
-                          className="text-text-muted hover:text-white transition-colors cursor-pointer p-1"
+                          className="text-text-muted hover:text-white transition-colors cursor-pointer p-1 shrink-0"
                           title="Copy address"
                         >
                           <span className="material-symbols-outlined text-sm">
@@ -213,7 +216,7 @@ export default function TokenPage({
                           </span>
                         </button>
                         {copied && (
-                          <span className="text-xs text-primary font-medium animate-fade-in">
+                          <span className="text-xs text-primary font-medium animate-fade-in shrink-0">
                             Copied!
                           </span>
                         )}
@@ -222,18 +225,18 @@ export default function TokenPage({
                   </div>
                 </div>
 
-                {/* Risk Gauge Header (Aligned Right, separated from absolute banner) */}
-                <div className="flex flex-col items-center sm:items-end bg-surface-dark/40 p-4 rounded-xl border border-white/10 backdrop-blur-md mt-4 sm:mt-0">
-                  <RiskGauge score={token.riskScore} />
-                  <span className="text-xs text-text-secondary uppercase tracking-wide font-medium mt-3">
+                {/* Right Side: Risk Gauge Header (Restored Size) */}
+                <div className="flex flex-col items-center bg-surface-dark/80 p-5 rounded-2xl border border-white/10 backdrop-blur-xl mt-2 md:mt-0 shadow-2xl">
+                  <RiskGauge score={token.riskScore} size={130} />
+                  <span className="text-xs text-text-secondary uppercase tracking-wide font-bold mt-3">
                     Risk Assessment
                   </span>
-                  <p className="text-xs text-text-muted text-center sm:text-right max-w-[200px] mt-1">
+                  <p className="text-xs text-text-muted text-center leading-relaxed mt-1 max-w-[160px]">
                     {riskLabel === "Safe"
-                      ? "Low vulnerability profile. Contract follows standard security patterns."
+                      ? "Low risk profile. High security."
                       : riskLabel === "Warning"
-                        ? "Moderate risk detected. Some parameters need attention."
-                        : "High vulnerability profile. Multiple red flags detected."}
+                        ? "Moderate risk. Checks needed."
+                        : "High risk. Red flags detected."}
                   </p>
                 </div>
               </div>

@@ -43,7 +43,7 @@ export default function RiskGauge({ score, size = 140 }: RiskGaugeProps) {
 
   return (
     <div className="relative inline-flex items-center justify-center">
-      <svg width={size} height={size} className="-rotate-90">
+      <svg width={size} height={size} className="-rotate-90 overflow-visible">
         {/* Background ring */}
         <circle
           cx={size / 2}
