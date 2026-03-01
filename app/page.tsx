@@ -206,7 +206,7 @@ export default function Home() {
               <span className="text-2xl">🔥</span> Trending Solana Tokens
             </h2>
             <p className="text-text-muted text-sm mt-1">
-              Live trending tokens on Solana — check for rugs before you ape in
+              Live trending tokens on Solana / check for rugs before you ape in
             </p>
           </div>
           <Link

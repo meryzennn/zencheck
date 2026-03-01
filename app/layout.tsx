@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ZenCheck — Solana Token Rug Checker",
+  title: "ZenCheck / Solana Token Rug Checker",
   description:
     "Analyze any Solana token address instantly for liquidity locks, mint authority, and holder distribution risks before you ape in.",
   keywords: [

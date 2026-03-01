@@ -63,7 +63,7 @@ export default function HowItWorksPage() {
       </h2>
       <p className="text-center text-text-muted max-w-2xl mx-auto mb-4">
         Every token starts with a perfect score of <strong>100</strong>. Our
-        algorithm ONLY checks for <strong>rug-pull indicators</strong> — it does{" "}
+        algorithm ONLY checks for <strong>rug-pull indicators</strong> /it does{" "}
         <strong>NOT</strong> penalize for price drops, low market cap, or low
         volume. A token that crashes 90% in price but has all authorities
         revoked and LP burned will still score &quot;Good&quot;.
@@ -201,7 +201,7 @@ export default function HowItWorksPage() {
                 <span className="text-warning font-bold">-5 pts</span>
               </div>
               <p className="text-xs text-text-muted">
-                Safer — dev can&apos;t withdraw until lock expires. Check the
+                Safer / dev can&apos;t withdraw until lock expires. Check the
                 lock duration on Solscan.
               </p>
             </div>
@@ -211,7 +211,7 @@ export default function HowItWorksPage() {
                 <span className="text-secondary font-bold">0 pts</span>
               </div>
               <p className="text-xs text-text-muted">
-                Safest state — liquidity is permanently locked. No one can ever
+                Safest state / liquidity is permanently locked. No one can ever
                 withdraw it.
               </p>
             </div>
@@ -237,7 +237,7 @@ export default function HowItWorksPage() {
                 <span className="text-warning font-bold">-5 pts</span>
               </div>
               <p className="text-xs text-text-muted">
-                Liquidity is thin relative to market cap — structural
+                Liquidity is thin relative to market cap / structural
                 vulnerability.
               </p>
             </div>
