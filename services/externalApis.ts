@@ -54,6 +54,7 @@ export interface DexScreenerResult {
   name: string;
   symbol: string;
   logoUrl: string | null;
+  bannerUrl: string | null;
   price: number;
   priceNative: string;
   priceChange24h: number;
@@ -77,7 +78,7 @@ export const externalApisService = {
         `https://api.dexscreener.com/tokens/v1/solana/${address}`,
         {
           headers: { Accept: "application/json" },
-          next: { revalidate: 5 }, // Cache for 5 seconds for real-time
+          cache: "no-store", // Bypass Next.js cache for true real-time polling
         },
       );
 
@@ -102,6 +103,9 @@ export const externalApisService = {
       const logoUrl =
         pairWithLogo?.info?.imageUrl ||
         `https://api.dicebear.com/9.x/identicon/svg?seed=${address}&backgroundColor=111111&rowColor=34d399,60a5fa,a78bfa`;
+
+      const pairWithBanner = pairs.find((p) => p.info?.header);
+      const bannerUrl = pairWithBanner?.info?.header || null;
 
       // Determine LP status from labels
       let lpStatus: "burned" | "locked" | "unlocked" = "unlocked";
@@ -135,6 +139,7 @@ export const externalApisService = {
           `Unknown (${address.slice(0, 4)}...${address.slice(-4)})`,
         symbol: bestPair.baseToken.symbol,
         logoUrl,
+        bannerUrl,
         price,
         priceNative,
         priceChange24h,
@@ -153,6 +158,7 @@ export const externalApisService = {
         name: "Unknown Token",
         symbol: "???",
         logoUrl: null,
+        bannerUrl: null,
         price: 0,
         priceNative: "0",
         priceChange24h: 0,
@@ -190,26 +196,44 @@ export const externalApisService = {
     }[] = [];
 
     if (pair.txns) {
+      const m5 = pair.txns.m5;
+      if (m5) {
+        if (m5.buys > 0) {
+          activity.push({
+            type: "buy",
+            description: `${m5.buys} buys in the last 5 minutes`,
+            time: "Last 5m",
+          });
+        }
+        if (m5.sells > 0) {
+          activity.push({
+            type: "sell",
+            description: `${m5.sells} sells in the last 5 minutes`,
+            time: "Last 5m",
+          });
+        }
+      }
+
       const h1 = pair.txns.h1;
-      if (h1) {
+      if (h1 && activity.length < 3) {
         if (h1.buys > 0) {
           activity.push({
             type: "buy",
-            description: `${h1.buys} buy transactions in the last hour`,
+            description: `${h1.buys} buys in the last hour`,
             time: "Last 1h",
           });
         }
         if (h1.sells > 0) {
           activity.push({
             type: "sell",
-            description: `${h1.sells} sell transactions in the last hour`,
+            description: `${h1.sells} sells in the last hour`,
             time: "Last 1h",
           });
         }
       }
 
       const h24 = pair.txns.h24;
-      if (h24) {
+      if (h24 && activity.length < 5) {
         activity.push({
           type: "buy",
           description: `${h24.buys} buys / ${h24.sells} sells in 24h (Total: ${h24.buys + h24.sells})`,

@@ -1,5 +1,10 @@
+import { Connection, PublicKey } from "@solana/web3.js";
+
 // Real Solana RPC implementation for token authorities
-// Uses Solana public mainnet RPC
+// Uses Solana public mainnet RPC, or Helius if env is set
+const rpcUrl =
+  process.env.HELIUS_RPC_URL || "https://api.mainnet-beta.solana.com";
+const connection = new Connection(rpcUrl, "confirmed");
 
 interface SolanaAccountInfo {
   mintAuthority: string | null;
@@ -17,27 +22,11 @@ export const solanaRpcService = {
     totalSupply: number;
   }> {
     try {
-      // Fetch mint account info from Solana RPC
-      const response = await fetch("https://api.mainnet-beta.solana.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: 1,
-          method: "getAccountInfo",
-          params: [
-            address,
-            {
-              encoding: "jsonParsed",
-            },
-          ],
-        }),
-      });
+      const pubkey = new PublicKey(address);
+      const accountInfo = await connection.getParsedAccountInfo(pubkey);
 
-      const data = await response.json();
-
-      if (data.result?.value?.data?.parsed?.info) {
-        const info = data.result.value.data.parsed.info;
+      if (accountInfo.value?.data && "parsed" in accountInfo.value.data) {
+        const info = accountInfo.value.data.parsed.info;
         const decimals = info.decimals ?? 9;
         const rawSupply = info.supply ?? "0";
         const totalSupply = parseInt(rawSupply) / Math.pow(10, decimals);
@@ -53,8 +42,6 @@ export const solanaRpcService = {
             info.freezeAuthority === "11111111111111111111111111111111"
               ? "revoked"
               : "active",
-          // Update authority is not directly on mint accounts;
-          // we report as revoked if both mint and freeze are revoked
           updateAuthority:
             info.mintAuthority === null && info.freezeAuthority === null
               ? "revoked"
@@ -80,105 +67,39 @@ export const solanaRpcService = {
 
   async getTopHolders(address: string) {
     try {
-      // Fetch largest token accounts
-      const response = await fetch("https://api.mainnet-beta.solana.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: 1,
-          method: "getTokenLargestAccounts",
-          params: [address],
-        }),
-      });
+      const pubkey = new PublicKey(address);
+      const largestAccounts = await connection.getTokenLargestAccounts(pubkey);
 
-      const data = await response.json();
+      if (largestAccounts.value && Array.isArray(largestAccounts.value)) {
+        const accounts = largestAccounts.value.slice(0, 5);
+        const supplyInfo = await connection.getTokenSupply(pubkey);
+        const totalAmount = supplyInfo.value.uiAmount || 1;
 
-      if (data.result?.value && Array.isArray(data.result.value)) {
-        const accounts = data.result.value.slice(0, 5);
+        return accounts.map((account, index: number) => {
+          const quantity = account.uiAmount || 0;
+          const percentage =
+            totalAmount > 0
+              ? parseFloat(((quantity / totalAmount) * 100).toFixed(2))
+              : 0;
 
-        // Get total supply for percentage calculation
-        const supplyRes = await fetch("https://api.mainnet-beta.solana.com", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            id: 1,
-            method: "getTokenSupply",
-            params: [address],
-          }),
+          return {
+            rank: index + 1,
+            address: `${account.address.toString().slice(0, 4)}...${account.address.toString().slice(-4)}`,
+            quantity,
+            percentage,
+            tag: percentage > 20 ? "WHALE ALERT" : undefined,
+          };
         });
-
-        const supplyData = await supplyRes.json();
-        const totalAmount = parseFloat(
-          supplyData.result?.value?.uiAmountString || "1",
-        );
-
-        return accounts.map(
-          (
-            account: {
-              address: string;
-              uiAmount: number;
-              uiAmountString: string;
-            },
-            index: number,
-          ) => {
-            const quantity = account.uiAmount || 0;
-            const percentage =
-              totalAmount > 0
-                ? parseFloat(((quantity / totalAmount) * 100).toFixed(2))
-                : 0;
-
-            return {
-              rank: index + 1,
-              address: `${account.address.slice(0, 4)}...${account.address.slice(-4)}`,
-              quantity,
-              percentage,
-              tag: percentage > 20 ? "WHALE ALERT" : undefined,
-            };
-          },
-        );
       }
 
-      throw new Error(
-        `RPC Rate limit or missing holder data: ${data.error?.message || "Unknown error"}`,
-      );
+      throw new Error("Could not fetch top holders or supply from Solana RPC.");
     } catch (error) {
       console.warn(
-        "Falling back to simulated holder data due to RPC limits:",
+        "RPC Rate Limited or Failed: Returning empty holders list.",
         error,
       );
-
-      // Fallback: simulate holder data based on address hash when RPC is rate limited
-      const hashCode = address.split("").reduce((a, b) => {
-        a = (a << 5) - a + b.charCodeAt(0);
-        return a & a;
-      }, 0);
-
-      const score = Math.abs(hashCode % 100);
-      const isSafe = score >= 50;
-
-      return [
-        {
-          rank: 1,
-          address: `${address.slice(0, 4)}...${address.slice(-4)}`,
-          quantity: 120_000_000,
-          percentage: isSafe ? 5.2 : 25.0,
-          tag: isSafe ? undefined : "WHALE ALERT",
-        },
-        {
-          rank: 2,
-          address: "Raydi...kP9",
-          quantity: 45_000_000,
-          percentage: 4.5,
-        },
-        {
-          rank: 3,
-          address: "Orca...1x3",
-          quantity: 32_000_000,
-          percentage: 3.2,
-        },
-      ];
+      // Return empty array instead of fake data so we never lie to the user
+      return [];
     }
   },
 };

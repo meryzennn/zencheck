@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
+import { Connection, PublicKey } from "@solana/web3.js";
 import type { TokenAnalysis } from "@/services/types";
 import GlassPanel from "@/components/GlassPanel";
 import RiskGauge from "@/components/RiskGauge";
@@ -48,22 +49,73 @@ export default function TokenPage({
     }
     fetchToken(true);
 
-    // Set up polling for real-time updates every 5 seconds
+    // Set up polling for real-time updates every 10 seconds
     const intervalId = setInterval(() => {
       fetchToken(false);
-    }, 5000);
+    }, 10000);
 
-    return () => clearInterval(intervalId);
+    // Set up Helius WebSocket for instant on-chain contract changes (Mint/Freeze authority)
+    let subscriptionId: number | null = null;
+    let connection: Connection | null = null;
+
+    try {
+      const apiKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
+      const wssUrl = apiKey
+        ? `wss://mainnet.helius-rpc.com/?api-key=${apiKey}`
+        : "wss://api.mainnet-beta.solana.com";
+
+      connection = new Connection(wssUrl, "confirmed");
+      const pubkey = new PublicKey(address);
+
+      subscriptionId = connection.onAccountChange(pubkey, (accountInfo) => {
+        console.log(
+          "⚡ WebSocket detected on-chain contract change!",
+          accountInfo,
+        );
+        fetchToken(false); // Instantly refresh UI, bypassing 10s poll
+      });
+    } catch (err) {
+      console.warn("WebSocket subscription failed:", err);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+      if (connection && subscriptionId !== null) {
+        connection.removeAccountChangeListener(subscriptionId);
+      }
+    };
   }, [address]);
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 gap-4">
-        <div className="w-10 h-10 border-4 border-surface-dark border-t-primary rounded-full animate-spin"></div>
-        <h2 className="text-xl font-bold text-white">Analyzing Token...</h2>
-        <p className="text-text-secondary">
-          Please wait while we check multiple data sources.
-        </p>
+      <div className="w-full max-w-7xl px-4 md:px-6 py-8 animate-pulse">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            {/* Header Skeleton */}
+            <div className="glass-panel p-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6">
+                <div className="w-16 h-16 rounded-full bg-surface-dark" />
+                <div className="flex-1 space-y-3 w-full">
+                  <div className="h-6 bg-surface-dark rounded w-1/3" />
+                  <div className="h-4 bg-surface-dark rounded w-1/4" />
+                </div>
+                <div className="w-24 h-24 rounded-full bg-surface-dark" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="glass-panel p-6 h-48 bg-surface-dark/50" />
+              <div className="glass-panel p-6 h-48 bg-surface-dark/50" />
+            </div>
+
+            <div className="glass-panel p-6 h-96 bg-surface-dark/50" />
+          </div>
+
+          <div className="flex flex-col gap-6">
+            <div className="glass-panel p-6 h-64 bg-surface-dark/50" />
+            <div className="glass-panel p-6 h-96 bg-surface-dark/50" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -96,72 +148,94 @@ export default function TokenPage({
         {/* Main content (2 columns) */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           {/* Token Header + Risk Gauge */}
-          <GlassPanel className="p-6 md:p-8">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  {token.logoUrl ? (
-                    <img
-                      src={token.logoUrl}
-                      alt={`${token.name} logo`}
-                      className="w-12 h-12 rounded-full object-cover ring-2 ring-primary/30"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = "none";
-                        const fallback =
-                          target.nextElementSibling as HTMLElement;
-                        if (fallback) fallback.style.display = "flex";
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black text-lg ring-2 ring-primary/30"
-                    style={{ display: token.logoUrl ? "none" : "flex" }}
-                  >
-                    {token.symbol?.[0] || "?"}
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold text-white">
-                      {token.name}{" "}
-                      <span className="text-text-secondary text-base font-medium">
-                        {token.symbol}
-                      </span>
-                    </h1>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-text-muted font-mono text-xs">
-                        {token.address.slice(0, 6)}...
-                        {token.address.slice(-4)}
-                      </span>
-                      <button
-                        onClick={copyAddress}
-                        className="text-text-muted hover:text-primary transition-colors cursor-pointer"
-                        title="Copy address"
-                      >
-                        <span className="material-symbols-outlined text-sm">
-                          {copied ? "check" : "content_copy"}
+          <GlassPanel className="p-0 overflow-hidden flex flex-col relative">
+            {/* Optional Banner Image */}
+            {token.bannerUrl && (
+              <div className="w-full h-32 md:h-48 relative overflow-hidden group">
+                <img
+                  src={token.bannerUrl}
+                  alt={`${token.name} banner`}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent"></div>
+              </div>
+            )}
+
+            <div
+              className={`p-6 ${token.bannerUrl ? "-mt-16 relative z-10" : ""}`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                <div className="flex-1">
+                  <div className="flex items-end gap-4 mb-2">
+                    {token.logoUrl ? (
+                      <img
+                        src={token.logoUrl}
+                        alt={`${token.name} logo`}
+                        className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover ring-4 ring-background shadow-xl bg-surface-dark"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                          const fallback =
+                            target.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = "flex";
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-black text-2xl ring-4 ring-background shadow-xl"
+                      style={{ display: token.logoUrl ? "none" : "flex" }}
+                    >
+                      {token.symbol?.[0] || "?"}
+                    </div>
+                    <div className="mb-1">
+                      <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-md flex items-center gap-2">
+                        {token.name}{" "}
+                        <span className="text-text-secondary text-lg font-medium bg-surface-dark/50 px-2 rounded">
+                          {token.symbol}
                         </span>
-                      </button>
-                      {copied && (
-                        <span className="text-xs text-secondary badge-animate">
-                          Copied!
+                      </h1>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-text-muted font-mono text-xs bg-surface-dark/80 px-2 py-1 rounded border border-white/5">
+                          {token.address.slice(0, 8)}...
+                          {token.address.slice(-6)}
                         </span>
-                      )}
+                        <button
+                          onClick={copyAddress}
+                          className="text-text-muted hover:text-white transition-colors cursor-pointer p-1"
+                          title="Copy address"
+                        >
+                          <span className="material-symbols-outlined text-sm">
+                            {copied ? "check" : "content_copy"}
+                          </span>
+                        </button>
+                        {copied && (
+                          <span className="text-xs text-primary font-medium animate-fade-in">
+                            Copied!
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <RiskGauge score={token.riskScore} />
-                <span className="text-xs text-text-secondary uppercase tracking-wide font-medium">
-                  Risk Assessment
-                </span>
-                <p className="text-xs text-text-muted text-center max-w-[200px]">
-                  {riskLabel === "Safe"
-                    ? "Low vulnerability profile. Contract follows standard security patterns."
-                    : riskLabel === "Warning"
-                      ? "Moderate risk detected. Some parameters need attention."
-                      : "High vulnerability profile. Multiple red flags detected."}
-                </p>
+
+                {/* Risk Gauge Header (Aligned Right, separated from absolute banner) */}
+                <div className="flex flex-col items-center sm:items-end bg-surface-dark/40 p-4 rounded-xl border border-white/10 backdrop-blur-md mt-4 sm:mt-0">
+                  <RiskGauge score={token.riskScore} />
+                  <span className="text-xs text-text-secondary uppercase tracking-wide font-medium mt-3">
+                    Risk Assessment
+                  </span>
+                  <p className="text-xs text-text-muted text-center sm:text-right max-w-[200px] mt-1">
+                    {riskLabel === "Safe"
+                      ? "Low vulnerability profile. Contract follows standard security patterns."
+                      : riskLabel === "Warning"
+                        ? "Moderate risk detected. Some parameters need attention."
+                        : "High vulnerability profile. Multiple red flags detected."}
+                  </p>
+                </div>
               </div>
             </div>
           </GlassPanel>
@@ -247,69 +321,81 @@ export default function TokenPage({
                 Top Holders Concentration
               </h3>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="text-text-secondary text-xs uppercase tracking-wider border-b border-border-dark">
-                    <th className="py-3 pr-4 font-medium">Rank</th>
-                    <th className="py-3 pr-4 font-medium">Address</th>
-                    <th className="py-3 pr-4 font-medium hidden sm:table-cell">
-                      Quantity
-                    </th>
-                    <th className="py-3 pr-4 font-medium">Percentage</th>
-                    <th className="py-3 font-medium text-right">Tag</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border-dark text-sm">
-                  {token.topHolders.map((holder) => (
-                    <tr
-                      key={holder.rank}
-                      className="hover:bg-white/5 transition-colors"
-                    >
-                      <td className="py-3 pr-4 text-text-muted font-medium">
-                        #{holder.rank}
-                      </td>
-                      <td className="py-3 pr-4 text-white font-mono text-xs">
-                        {holder.address}
-                      </td>
-                      <td className="py-3 pr-4 text-text-secondary hidden sm:table-cell">
-                        {formatNumber(holder.quantity)}
-                      </td>
-                      <td className="py-3 pr-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-white text-sm">
-                            {holder.percentage}%
-                          </span>
-                          <div className="flex-1 h-1.5 bg-border-dark rounded-full max-w-[80px]">
-                            <div
-                              className={`h-full rounded-full ${
-                                holder.percentage > 10
-                                  ? "bg-danger"
-                                  : "bg-primary"
-                              }`}
-                              style={{
-                                width: `${Math.min(holder.percentage * 2, 100)}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 text-right">
-                        {holder.tag ? (
-                          <span className="text-xs font-bold text-danger bg-danger/10 px-2 py-0.5 rounded-full border border-danger/20">
-                            {holder.tag}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-text-muted">
-                            Regular
-                          </span>
-                        )}
-                      </td>
+            {token.topHolders && token.topHolders.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="text-text-secondary text-xs uppercase tracking-wider border-b border-border-dark">
+                      <th className="py-3 pr-4 font-medium">Rank</th>
+                      <th className="py-3 pr-4 font-medium">Address</th>
+                      <th className="py-3 pr-4 font-medium hidden sm:table-cell">
+                        Quantity
+                      </th>
+                      <th className="py-3 pr-4 font-medium">Percentage</th>
+                      <th className="py-3 font-medium text-right">Tag</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border-dark text-sm">
+                    {token.topHolders.map((holder) => (
+                      <tr
+                        key={holder.rank}
+                        className="hover:bg-white/5 transition-colors"
+                      >
+                        <td className="py-3 pr-4 text-text-muted font-medium">
+                          #{holder.rank}
+                        </td>
+                        <td className="py-3 pr-4 text-white font-mono text-xs">
+                          {holder.address}
+                        </td>
+                        <td className="py-3 pr-4 text-text-secondary hidden sm:table-cell">
+                          {formatNumber(holder.quantity)}
+                        </td>
+                        <td className="py-3 pr-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white text-sm">
+                              {holder.percentage}%
+                            </span>
+                            <div className="flex-1 h-1.5 bg-border-dark rounded-full max-w-[80px]">
+                              <div
+                                className={`h-full rounded-full ${
+                                  holder.percentage > 10
+                                    ? "bg-danger"
+                                    : "bg-primary"
+                                }`}
+                                style={{
+                                  width: `${Math.min(holder.percentage * 2, 100)}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 text-right">
+                          {holder.tag ? (
+                            <span className="text-xs font-bold text-danger bg-danger/10 px-2 py-0.5 rounded-full border border-danger/20">
+                              {holder.tag}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-text-muted">
+                              Regular
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-center bg-surface-dark/50 rounded-lg border border-border-dark border-dashed">
+                <span className="material-symbols-outlined text-4xl mb-3 text-text-muted">
+                  account_balance_wallet
+                </span>
+                <p className="text-white font-medium">Data Unavailable</p>
+                <p className="text-sm text-text-muted mt-1 max-w-sm mx-auto">
+                  Unable to fetch top holders safely. Check network or RPC keys.
+                </p>
+              </div>
+            )}
           </GlassPanel>
         </div>
 

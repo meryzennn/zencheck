@@ -66,6 +66,7 @@ export const tokenAnalysisService = {
       symbol: marketData.symbol,
       address,
       logoUrl: marketData.logoUrl,
+      bannerUrl: marketData.bannerUrl,
       riskScore,
       mintAuthority: rpcData.mintAuthority,
       freezeAuthority: rpcData.freezeAuthority,

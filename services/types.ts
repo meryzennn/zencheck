@@ -3,6 +3,7 @@ export interface TokenAnalysis {
   symbol: string;
   address: string;
   logoUrl: string | null;
+  bannerUrl: string | null;
   riskScore: number;
   mintAuthority: "revoked" | "active";
   freezeAuthority: "revoked" | "active";
