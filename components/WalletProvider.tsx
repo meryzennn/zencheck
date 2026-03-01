@@ -7,8 +7,14 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { WalletError } from "@solana/wallet-adapter-base";
-// removed unused manual import
-
+import {
+  PhantomWalletAdapter,
+  SolflareWalletAdapter,
+  CoinbaseWalletAdapter,
+  TrustWalletAdapter,
+  LedgerWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
+import { BackpackWalletAdapter } from "@solana/wallet-adapter-backpack";
 // Import wallet adapter default styles
 import "@solana/wallet-adapter-react-ui/styles.css";
 
@@ -69,11 +75,12 @@ export default function WalletContextProvider({
 
   const wallets = useMemo(
     () => [
-      /**
-       * Wallets that implement Wallet Standard are automatically detected.
-       * Phantom, Solflare, Backpack, and Trust all implement the standard.
-       * We only pass wallets here that do not support the Wallet Standard.
-       */
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new BackpackWalletAdapter(),
+      new CoinbaseWalletAdapter(),
+      new TrustWalletAdapter(),
+      new LedgerWalletAdapter(),
     ],
     [],
   );
