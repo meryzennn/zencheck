@@ -6,7 +6,9 @@ export interface TokenAnalysis {
   bannerUrl: string | null;
   riskScore: number;
   mintAuthority: "revoked" | "active";
+  mintAuthorityAddress: string | null;
   freezeAuthority: "revoked" | "active";
+  freezeAuthorityAddress: string | null;
   updateAuthority: "revoked" | "active";
   lpStatus: "burned" | "locked" | "unlocked";
   dex: string;

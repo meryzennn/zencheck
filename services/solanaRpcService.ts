@@ -18,6 +18,8 @@ export const solanaRpcService = {
     mintAuthority: "revoked" | "active";
     freezeAuthority: "revoked" | "active";
     updateAuthority: "revoked" | "active";
+    mintAuthorityAddress: string | null;
+    freezeAuthorityAddress: string | null;
     decimals: number;
     totalSupply: number;
   }> {
@@ -45,6 +47,8 @@ export const solanaRpcService = {
           // Update Authority: Derive from whether the token is mutable
           // If mint authority is still active, the contract is effectively updatable
           updateAuthority: info.mintAuthority === null ? "revoked" : "active",
+          mintAuthorityAddress: info.mintAuthority || null,
+          freezeAuthorityAddress: info.freezeAuthority || null,
           decimals,
           totalSupply,
         };
@@ -58,6 +62,8 @@ export const solanaRpcService = {
         mintAuthority: "active",
         freezeAuthority: "active",
         updateAuthority: "active",
+        mintAuthorityAddress: null,
+        freezeAuthorityAddress: null,
         decimals: 9,
         totalSupply: 0,
       };

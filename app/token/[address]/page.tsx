@@ -1,10 +1,12 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useRef } from "react";
+import html2canvas from "html2canvas-pro";
 import { Connection, PublicKey } from "@solana/web3.js";
 import type { TokenAnalysis } from "@/services/types";
 import GlassPanel from "@/components/GlassPanel";
 import RiskGauge from "@/components/RiskGauge";
+import ReportCard from "@/components/ReportCard";
 import { StatusBadge, LpStatusBadge } from "@/components/StatusBadge";
 import { getRiskLevel } from "@/components/RiskBadge";
 
@@ -32,6 +34,8 @@ export default function TokenPage({
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [holdersVisible, setHoldersVisible] = useState(10);
+  const [logoBase64, setLogoBase64] = useState<string | null>(null);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function fetchToken(isInitial = false) {
@@ -128,8 +132,55 @@ export default function TokenPage({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const fetchLogoAsBase64 = async (url: string): Promise<string | null> => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      return null;
+    }
+  };
+
+  const downloadReport = async () => {
+    if (!token || !reportRef.current) return;
+    try {
+      // Pre-fetch logo as base64 to bypass CORS
+      if (token.logoUrl && !logoBase64) {
+        const b64 = await fetchLogoAsBase64(token.logoUrl);
+        if (b64) {
+          setLogoBase64(b64);
+          // Wait for React to re-render with the base64 logo
+          await new Promise((r) => setTimeout(r, 200));
+        }
+      }
+
+      const canvas = await html2canvas(reportRef.current, {
+        backgroundColor: "#020617",
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      const link = document.createElement("a");
+      link.download = `zencheck-${token.symbol.toLowerCase()}-${token.address.slice(0, 8)}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (err) {
+      console.error("Failed to generate report image:", err);
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl px-4 md:px-6 py-8">
+      {/* Hidden report card for PNG export */}
+      {token && (
+        <ReportCard ref={reportRef} token={token} logoBase64={logoBase64} />
+      )}
       {/* Token Header + Banner + Risk Gauge */}
       <GlassPanel className="p-0 overflow-hidden flex flex-col relative mb-6">
         {/* Optional Banner Image */}
@@ -369,6 +420,72 @@ export default function TokenPage({
                   <span className="text-text-muted">LP Status</span>
                   <LpStatusBadge status={token.lpStatus} />
                 </div>
+                {token.mintAuthorityAddress && (
+                  <div className="flex justify-between items-center text-sm border-t border-border-dark pt-3">
+                    <span className="text-text-muted">Creator</span>
+                    <div className="flex items-center gap-1.5">
+                      <a
+                        href={`https://solscan.io/account/${token.mintAuthorityAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline font-mono text-xs flex items-center gap-1"
+                        title={token.mintAuthorityAddress}
+                      >
+                        {token.mintAuthorityAddress.slice(0, 4)}...
+                        {token.mintAuthorityAddress.slice(-4)}
+                        <span className="material-symbols-outlined text-[10px]">
+                          open_in_new
+                        </span>
+                      </a>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            token.mintAuthorityAddress!,
+                          );
+                        }}
+                        className="text-text-muted hover:text-primary transition-colors cursor-pointer p-0.5"
+                        title="Copy address"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          content_copy
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {token.freezeAuthorityAddress && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-text-muted">Freeze Addr</span>
+                    <div className="flex items-center gap-1.5">
+                      <a
+                        href={`https://solscan.io/account/${token.freezeAuthorityAddress}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-danger hover:underline font-mono text-xs flex items-center gap-1"
+                        title={token.freezeAuthorityAddress}
+                      >
+                        {token.freezeAuthorityAddress.slice(0, 4)}...
+                        {token.freezeAuthorityAddress.slice(-4)}
+                        <span className="material-symbols-outlined text-[10px]">
+                          open_in_new
+                        </span>
+                      </a>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            token.freezeAuthorityAddress!,
+                          );
+                        }}
+                        className="text-text-muted hover:text-danger transition-colors cursor-pointer p-0.5"
+                        title="Copy address"
+                      >
+                        <span className="material-symbols-outlined text-sm">
+                          content_copy
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </GlassPanel>
@@ -717,7 +834,10 @@ export default function TokenPage({
                   open_in_new
                 </span>
               </a>
-              <button className="flex items-center justify-between p-3 rounded-lg bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors cursor-pointer w-full">
+              <button
+                onClick={downloadReport}
+                className="flex items-center justify-between p-3 rounded-lg bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors cursor-pointer w-full"
+              >
                 <span className="text-sm text-white font-medium">
                   Download Report
                 </span>

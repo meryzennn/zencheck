@@ -280,8 +280,12 @@ export default function Home() {
                             <span className="font-bold text-white block">
                               {token.symbol}
                             </span>
-                            <span className="text-text-muted text-xs">
+                            <span className="text-text-muted text-xs block">
                               {token.name}
+                            </span>
+                            <span className="text-text-muted text-[10px] font-mono opacity-60">
+                              {token.address.slice(0, 4)}...
+                              {token.address.slice(-4)}
                             </span>
                           </div>
                         </div>
