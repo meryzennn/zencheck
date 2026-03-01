@@ -7,12 +7,7 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { WalletError } from "@solana/wallet-adapter-base";
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-  TrustWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
-import { BackpackWalletAdapter } from "@solana/wallet-adapter-backpack";
+// removed unused manual import
 
 // Import wallet adapter default styles
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -74,10 +69,11 @@ export default function WalletContextProvider({
 
   const wallets = useMemo(
     () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-      new BackpackWalletAdapter(),
-      new TrustWalletAdapter(),
+      /**
+       * Wallets that implement Wallet Standard are automatically detected.
+       * Phantom, Solflare, Backpack, and Trust all implement the standard.
+       * We only pass wallets here that do not support the Wallet Standard.
+       */
     ],
     [],
   );
@@ -105,7 +101,7 @@ export default function WalletContextProvider({
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect onError={onError}>
+      <WalletProvider wallets={wallets} onError={onError} autoConnect>
         <WalletModalProvider>
           {children}
           {toast && (
