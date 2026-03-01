@@ -26,9 +26,7 @@ export interface WalletPortfolio {
 }
 
 // Batch fetch token prices from DexScreener
-async function fetchTokenPrices(
-  mints: string[],
-): Promise<
+async function fetchTokenPrices(mints: string[]): Promise<
   Map<
     string,
     {
@@ -80,8 +78,11 @@ async function fetchTokenPrices(
   return priceMap;
 }
 
-// Fetch SOL price
-async function getSolPrice(): Promise<number> {
+// Fetch SOL price and data
+async function getSolData(): Promise<{
+  priceUsd: number;
+  priceChange24h: number;
+}> {
   try {
     const res = await fetch(
       "https://api.dexscreener.com/tokens/v1/solana/So11111111111111111111111111111111111111112",
@@ -91,13 +92,16 @@ async function getSolPrice(): Promise<number> {
       const data = await res.json();
       const pairs = Array.isArray(data) ? data : [];
       if (pairs.length > 0) {
-        return parseFloat(pairs[0].priceUsd) || 0;
+        return {
+          priceUsd: parseFloat(pairs[0].priceUsd) || 0,
+          priceChange24h: pairs[0].priceChange?.h24 || 0,
+        };
       }
     }
   } catch {
     // fallback
   }
-  return 0;
+  return { priceUsd: 0, priceChange24h: 0 };
 }
 
 // Quick risk score from DexScreener data (simplified version of full analysis)
@@ -116,16 +120,16 @@ export async function getWalletPortfolio(
   const walletPubkey = new PublicKey(walletAddress);
 
   // Fetch SOL balance and token accounts in parallel
-  const [solBalanceLamports, tokenAccounts, solPrice] = await Promise.all([
+  const [solBalanceLamports, tokenAccounts, solData] = await Promise.all([
     connection.getBalance(walletPubkey),
     connection.getParsedTokenAccountsByOwner(walletPubkey, {
       programId: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
     }),
-    getSolPrice(),
+    getSolData(),
   ]);
 
   const solBalance = solBalanceLamports / 1e9;
-  const solValueUsd = solBalance * solPrice;
+  const solValueUsd = solBalance * solData.priceUsd;
 
   // Extract token mints with non-zero balances
   const tokenData: {
@@ -153,27 +157,43 @@ export async function getWalletPortfolio(
   const priceData = await fetchTokenPrices(mints);
 
   // Build portfolio tokens
-  const tokens: PortfolioToken[] = tokenData
-    .map((t) => {
-      const price = priceData.get(t.mint);
-      return {
-        mint: t.mint,
-        name: price?.name || "Unknown Token",
-        symbol: price?.symbol || "???",
-        logoUrl: price?.logoUrl || null,
-        balance: t.balance,
-        decimals: t.decimals,
-        priceUsd: price?.priceUsd || 0,
-        valueUsd: t.balance * (price?.priceUsd || 0),
-        priceChange24h: price?.priceChange24h || 0,
-        riskScore: price ? quickRiskScore(price) : null,
-      };
-    })
-    // Sort by USD value descending
-    .sort((a, b) => b.valueUsd - a.valueUsd);
+  const tokens: PortfolioToken[] = tokenData.map((t) => {
+    const price = priceData.get(t.mint);
+    return {
+      mint: t.mint,
+      name: price?.name || "Unknown Token",
+      symbol: price?.symbol || "???",
+      logoUrl: price?.logoUrl || null,
+      balance: t.balance,
+      decimals: t.decimals,
+      priceUsd: price?.priceUsd || 0,
+      valueUsd: t.balance * (price?.priceUsd || 0),
+      priceChange24h: price?.priceChange24h || 0,
+      riskScore: price ? quickRiskScore(price) : null,
+    };
+  });
 
   const totalValueUsd =
     solValueUsd + tokens.reduce((sum, t) => sum + t.valueUsd, 0);
+
+  if (solBalance > 0) {
+    tokens.push({
+      mint: "So11111111111111111111111111111111111111112",
+      name: "Solana",
+      symbol: "SOL",
+      logoUrl:
+        "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png",
+      balance: solBalance,
+      decimals: 9,
+      priceUsd: solData.priceUsd,
+      valueUsd: solValueUsd,
+      priceChange24h: solData.priceChange24h,
+      riskScore: null,
+    });
+  }
+
+  // Sort by USD value descending
+  tokens.sort((a, b) => b.valueUsd - a.valueUsd);
 
   return {
     wallet: walletAddress,

@@ -6,6 +6,7 @@ import GlassPanel from "@/components/GlassPanel";
 interface ChartToken {
   symbol: string;
   name: string;
+  mint: string;
   valueUsd: number;
   priceChange24h: number;
   logoUrl: string | null;
@@ -65,9 +66,13 @@ export default function PortfolioChart({
     });
   }
 
-  // Add tokens with value, up to 7
+  // Add tokens with value, up to 7, excluding the mocked SOL token if present
   const valuedTokens = tokens
-    .filter((t) => t.valueUsd >= 0.01)
+    .filter(
+      (t) =>
+        t.valueUsd >= 0.01 &&
+        t.mint !== "So11111111111111111111111111111111111111112",
+    )
     .sort((a, b) => b.valueUsd - a.valueUsd);
 
   const topTokens = valuedTokens.slice(0, 7);
