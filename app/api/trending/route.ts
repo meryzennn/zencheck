@@ -3,6 +3,7 @@ import { tokenAnalysisService } from "../../../services/tokenAnalysis";
 
 export const dynamic = "force-dynamic";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let cachedData: any = null;
 let lastFetchTime = 0;
 const CACHE_DURATION = 60 * 1000; // 60 seconds
@@ -37,6 +38,7 @@ export async function GET() {
     const WRAPPED_SOL = "So11111111111111111111111111111111111111112";
 
     const solanaTokens = data
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .map((pool: any) => {
         const baseId = pool.relationships?.base_token?.data?.id?.replace(
           "solana_",
@@ -61,11 +63,13 @@ export async function GET() {
           totalAmount: pool.attributes?.transactions?.h24?.buys || 0, // Mock searches/boosts with 24h buys
         };
       })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .filter((t: any) => t.tokenAddress && t.tokenAddress !== WRAPPED_SOL)
       .slice(0, 30);
 
     // Enrich each token with our own risk analysis
     const enrichedTrending = await Promise.all(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       solanaTokens.map(async (t: any) => {
         try {
           const analysis = await tokenAnalysisService.analyzeToken(

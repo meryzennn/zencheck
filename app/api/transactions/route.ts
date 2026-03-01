@@ -103,7 +103,6 @@ export async function GET(request: NextRequest) {
 
         // Check if it involved token program (likely a swap)
         const programIds = accountKeys.map((k) => k.pubkey.toBase58());
-        const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
         if (
           programIds.some(
             (id) =>

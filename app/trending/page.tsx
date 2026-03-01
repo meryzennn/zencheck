@@ -123,6 +123,7 @@ export default function TrendingPage() {
         const data = await res.json();
 
         if (Array.isArray(data)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const formatted: TrendingToken[] = data.map((t: any) => ({
             name: t.name || "Unknown Token",
             symbol: t.symbol || "$UNK",

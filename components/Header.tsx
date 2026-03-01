@@ -29,18 +29,19 @@ export default function Header() {
 
   // Route change loading bar
   useEffect(() => {
+    let timer: NodeJS.Timeout;
     if (prevPathname.current !== pathname) {
-      setPageLoading(true);
+      setTimeout(() => setPageLoading(true), 0);
       prevPathname.current = pathname;
-      const timer = setTimeout(() => setPageLoading(false), 600);
-      return () => clearTimeout(timer);
+      timer = setTimeout(() => setPageLoading(false), 600);
     }
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   // Fetch SOL balance when connected
   useEffect(() => {
     if (!publicKey) {
-      setSolBalance(null);
+      setTimeout(() => setSolBalance(null), 0);
       return;
     }
     let cancelled = false;

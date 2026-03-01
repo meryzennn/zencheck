@@ -105,7 +105,7 @@ async function getSolData(): Promise<{
 }
 
 // Quick risk score from DexScreener data (simplified version of full analysis)
-function quickRiskScore(tokenData: {
+function quickRiskScore(_tokenData: {
   priceUsd: number;
   priceChange24h: number;
 }): number | null {

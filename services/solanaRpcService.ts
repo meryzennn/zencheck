@@ -6,13 +6,6 @@ const rpcUrl =
   process.env.ALCHEMY_RPC_URL || "https://api.mainnet-beta.solana.com";
 const connection = new Connection(rpcUrl, "confirmed");
 
-interface SolanaAccountInfo {
-  mintAuthority: string | null;
-  freezeAuthority: string | null;
-  decimals: number;
-  supply: string;
-}
-
 export const solanaRpcService = {
   async getTokenAuthorities(address: string): Promise<{
     mintAuthority: "revoked" | "active";
