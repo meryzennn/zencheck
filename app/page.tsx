@@ -28,6 +28,13 @@ const features = [
     description:
       "Detect whale wallets and dangerous supply concentration. Visualize the top 10 holders and sniper bot activity.",
   },
+  {
+    icon: "account_balance_wallet",
+    iconColor: "text-accent",
+    title: "Portfolio Tracking",
+    description:
+      "Connect your wallet to analyze your token holdings and review your recent transaction history.",
+  },
 ];
 
 const popularTokens = [
@@ -136,17 +143,40 @@ export default function Home() {
           {/* Search Bar */}
           <div className="w-full max-w-xl mt-8 animate-slide-up-delayed-2">
             <SearchInput />
-            <div className="flex gap-4 mt-4 justify-center text-xs text-text-muted">
-              <span>Popular:</span>
-              {popularTokens.map((t) => (
+            <div className="flex flex-wrap gap-4 mt-4 justify-center text-xs text-text-muted">
+              <span>Trending:</span>
+              {(trendingTokens.length > 0
+                ? trendingTokens.slice(0, 4)
+                : popularTokens
+              ).map((t) => (
                 <Link
                   key={t.symbol}
                   href={`/token/${t.address}`}
-                  className="cursor-pointer hover:text-secondary transition-colors hover:scale-110 transform duration-200"
+                  className="cursor-pointer hover:text-secondary transition-colors hover:scale-110 transform duration-200 font-medium"
                 >
                   {t.symbol}
                 </Link>
               ))}
+            </div>
+
+            <div className="mt-8 text-center animate-slide-up-delayed-2">
+              <p className="text-text-secondary text-sm md:text-base mb-2">
+                <span className="text-white font-medium">
+                  Have Solana tokens in your wallet?
+                </span>
+              </p>
+              <p className="text-text-muted text-xs md:text-sm max-w-lg mx-auto">
+                Connect your wallet to automatically scan your token holdings
+                and review your recent transaction history for potential risks
+                right in your personal{" "}
+                <Link
+                  href="/portfolio"
+                  className="text-primary hover:text-white transition-colors underline underline-offset-2"
+                >
+                  Portfolio
+                </Link>
+                .
+              </p>
             </div>
           </div>
         </div>
@@ -162,7 +192,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((f, i) => (
             <GlassPanel
               key={f.title}
@@ -347,9 +377,9 @@ export default function Home() {
         )}
 
         {/* Interactive CTA */}
-        <div className="mt-12 text-center">
+        <div className="mt-12 flex items-center justify-center">
           <Link href="/trending">
-            <button className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold text-lg shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 hover:scale-105 transform cursor-pointer overflow-hidden">
+            <button className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-secondary text-white font-bold text-lg shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 hover:scale-105 transform cursor-pointer overflow-hidden w-full sm:w-auto">
               <span className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
               <span className="material-symbols-outlined text-2xl relative z-10">
                 explore

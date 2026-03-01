@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const socialLinks = [
   {
-    name: "Website",
+    name: "SocialHub",
     href: "https://0x5zen.vercel.app",
     label: "0x5zen.vercel.app",
     icon: (
@@ -35,7 +35,7 @@ const socialLinks = [
   },
   {
     name: "GitHub",
-    href: "https://github.com/0x5zen",
+    href: "https://github.com/meryzennn",
     label: "GitHub",
     icon: (
       <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -58,8 +58,8 @@ const socialLinks = [
     ),
   },
   {
-    name: "Discord",
-    href: "https://discord.gg/0x5zen",
+    name: "Discord Server",
+    href: "https://discord.gg/XV9bjGxwD5",
     label: "Discord",
     icon: (
       <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -183,26 +183,6 @@ export default function Footer() {
         <div className="w-full h-px bg-gradient-to-r from-transparent via-border-dark to-transparent mb-6" />
 
         {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-text-muted text-xs">
-            © 2026 ZenCheck. All rights reserved. Built on Solana.
-          </p>
-          <p className="text-text-muted text-xs flex items-center gap-1.5">
-            Crafted with
-            <span className="inline-block animate-pulse text-red-400 text-sm">
-              ♥
-            </span>
-            by{" "}
-            <a
-              href="https://0x5zen.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 font-medium transition-colors duration-200 hover:underline underline-offset-2"
-            >
-              0x5zen
-            </a>
-          </p>
-        </div>
       </div>
     </footer>
   );

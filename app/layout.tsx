@@ -44,7 +44,7 @@ export default function RootLayout({
         <WalletContextProvider>
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <Header />
-            <main className="flex-grow flex flex-col items-center w-full">
+            <main className="flex-grow flex flex-col items-center w-full pt-[76px]">
               {children}
             </main>
             <Footer />

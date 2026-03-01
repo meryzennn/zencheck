@@ -85,17 +85,27 @@ export default function Header() {
     setDropdownOpen(false);
   }, [disconnect]);
 
-  const navLinks = [
+  interface NavLink {
+    href?: string;
+    label?: string;
+    icon?: string;
+    separator?: boolean;
+  }
+
+  const navLinks: NavLink[] = [
     { href: "/", label: "Home", icon: "home" },
     { href: "/trending", label: "Trending", icon: "local_fire_department" },
     { href: "/how-it-works", label: "How it Works", icon: "help_outline" },
     ...(connected
-      ? [{ href: "/portfolio", label: "Portfolio", icon: "account_balance" }]
+      ? [
+          { separator: true },
+          { href: "/portfolio", label: "Portfolio", icon: "account_balance" },
+        ]
       : []),
   ];
 
   return (
-    <header className="sticky top-0 z-50 glass-panel border-b border-border-dark">
+    <header className="fixed top-0 w-full z-50 border-b border-border-dark bg-background/80 backdrop-blur-lg shadow-sm">
       {/* Loading Bar */}
       {pageLoading && (
         <div className="absolute top-0 left-0 w-full h-[2px] z-[60] overflow-hidden">
@@ -118,17 +128,26 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-5">
-          <nav className="flex items-center gap-1">
-            {navLinks.map((link) => {
+          <nav className="flex items-center gap-2 bg-white/5 px-2 py-1.5 rounded-xl border border-white/10">
+            {navLinks.map((link, index) => {
+              if (link.separator) {
+                return (
+                  <div
+                    key={`sep-${index}`}
+                    className="w-px h-5 bg-white/20 mx-1"
+                  />
+                );
+              }
+
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
-                  className={`relative text-sm font-medium px-3.5 py-2 rounded-lg transition-all duration-300 group flex items-center gap-2 ${
+                  href={link.href!}
+                  className={`relative text-sm font-medium px-4 py-2 rounded-lg transition-all duration-300 group flex items-center gap-2 ${
                     isActive
-                      ? "text-white bg-white/5"
-                      : "text-text-secondary hover:text-white hover:bg-white/[0.03]"
+                      ? "text-white bg-primary/20 shadow-inner"
+                      : "text-text-secondary hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <span
@@ -302,12 +321,21 @@ export default function Header() {
       {/* Mobile Menu */}
       {mobileOpen && (
         <div className="md:hidden pb-4 border-t border-border-dark pt-4 px-6 flex flex-col gap-3 animate-slide-down">
-          {navLinks.map((link) => {
+          {navLinks.map((link, index) => {
+            if (link.separator) {
+              return (
+                <div
+                  key={`sep-${index}`}
+                  className="w-full h-px bg-white/10 my-2"
+                />
+              );
+            }
+
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
-                href={link.href}
+                href={link.href!}
                 className={`flex items-center gap-3 text-sm font-medium px-3 py-2.5 rounded-lg transition-all ${
                   isActive
                     ? "text-white bg-white/5"
