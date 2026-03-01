@@ -10,7 +10,9 @@ import { WalletError } from "@solana/wallet-adapter-base";
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
+  TrustWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
+import { BackpackWalletAdapter } from "@solana/wallet-adapter-backpack";
 
 // Import wallet adapter default styles
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -71,7 +73,12 @@ export default function WalletContextProvider({
   }, []);
 
   const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new BackpackWalletAdapter(),
+      new TrustWalletAdapter(),
+    ],
     [],
   );
 

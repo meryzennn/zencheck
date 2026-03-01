@@ -158,26 +158,6 @@ export default function Home() {
                 </Link>
               ))}
             </div>
-
-            <div className="mt-8 text-center animate-slide-up-delayed-2">
-              <p className="text-text-secondary text-sm md:text-base mb-2">
-                <span className="text-white font-medium">
-                  Have Solana tokens in your wallet?
-                </span>
-              </p>
-              <p className="text-text-muted text-xs md:text-sm max-w-lg mx-auto">
-                Connect your wallet to automatically scan your token holdings
-                and review your recent transaction history for potential risks
-                right in your personal{" "}
-                <Link
-                  href="/portfolio"
-                  className="text-primary hover:text-white transition-colors underline underline-offset-2"
-                >
-                  Portfolio
-                </Link>
-                .
-              </p>
-            </div>
           </div>
         </div>
       </section>
