@@ -5,6 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WalletContextProvider from "@/components/WalletProvider";
 
+import CookieConsent from "@/components/CookieConsent";
+
 const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "900"],
@@ -44,6 +46,7 @@ export default function RootLayout({
         <WalletContextProvider>
           <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
             <Header />
+            <CookieConsent />
             <main className="flex-grow flex flex-col items-center w-full pt-[76px]">
               {children}
             </main>
