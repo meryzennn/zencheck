@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WalletContextProvider from "@/components/WalletProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,13 +41,15 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-display antialiased min-h-screen flex flex-col bg-bg-dark text-text-primary`}
       >
-        <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
-          <Header />
-          <main className="flex-grow flex flex-col items-center w-full">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        <WalletContextProvider>
+          <div className="relative flex flex-col min-h-screen w-full overflow-x-hidden">
+            <Header />
+            <main className="flex-grow flex flex-col items-center w-full">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </WalletContextProvider>
       </body>
     </html>
   );
