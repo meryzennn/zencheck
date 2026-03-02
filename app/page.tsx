@@ -11,29 +11,73 @@ const features = [
     icon: "verified_user",
     iconColor: "text-secondary",
     title: "Authority Checks",
-    description:
-      "Instantly verify mint authority and freeze authority status. Know if the dev can print more tokens or freeze your wallet.",
+    description: (
+      <p>
+        Instantly verify mint authority and freeze authority status. Know if the
+        dev can print more tokens or freeze your wallet.
+      </p>
+    ),
   },
   {
     icon: "water_drop",
     iconColor: "text-primary",
     title: "Liquidity Analysis",
-    description:
-      "Detailed breakdown of LP burn status and locked liquidity percentages. Don't fall for fake liquidity pools.",
+    description: (
+      <p>
+        Detailed breakdown of LP burn status and locked liquidity percentages.
+        Don&apos;t fall for fake liquidity pools.
+      </p>
+    ),
   },
   {
     icon: "pie_chart",
     iconColor: "text-danger",
     title: "Holder Distribution",
-    description:
-      "Detect whale wallets and dangerous supply concentration. Visualize the top 10 holders and sniper bot activity.",
+    description: (
+      <div className="flex flex-col gap-2">
+        <p>
+          Detect whale wallets and token concentration. We automatically tag
+          holders:
+        </p>
+        <ul className="text-sm space-y-1 mt-1 ml-2">
+          <li className="flex items-center gap-2">
+            <span className="text-danger flex items-center gap-1">
+              🐋 Whale:
+            </span>{" "}
+            $10k+
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="text-warning flex items-center gap-1">
+              🦐 Shrimp:
+            </span>{" "}
+            $250+
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="text-secondary flex items-center gap-1">
+              🐟 Fish:
+            </span>{" "}
+            $10+
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="text-text-muted flex items-center gap-1">
+              🦠 Plankton:
+            </span>{" "}
+            &lt;$10
+          </li>
+        </ul>
+      </div>
+    ),
   },
   {
     icon: "account_balance_wallet",
     iconColor: "text-accent",
     title: "Portfolio Tracking",
-    description:
-      "Connect your wallet to analyze your token holdings and review your recent transaction history.",
+    description: (
+      <p>
+        Connect your wallet to analyze your token holdings and review your
+        recent transaction history.
+      </p>
+    ),
   },
 ];
 
@@ -189,9 +233,9 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">{f.title}</h3>
-                <p className="text-text-secondary text-sm leading-relaxed">
+                <div className="text-text-secondary text-sm leading-relaxed">
                   {f.description}
-                </p>
+                </div>
               </div>
             </GlassPanel>
           ))}

@@ -28,6 +28,7 @@ export interface TokenAnalysis {
     rawAddress: string;
     quantity: number;
     percentage: number;
+    valueUsd?: number;
     tag?: string;
   }[];
   recentActivity: {

@@ -33,11 +33,15 @@ export const tokenAnalysisService = {
     const cached = await databaseService.getTokenCache(address);
     if (cached) return cached;
 
-    // 3. Fetch from RPC and DexScreener API in parallel
-    const [rpcData, holders, marketData] = await Promise.all([
+    // We need marketData first to get the price for the top holders
+    const marketData = await externalApisService.getMarketData(address);
+    const [rpcData, holders] = await Promise.all([
       solanaRpcService.getTokenAuthorities(address),
-      solanaRpcService.getTopHolders(address),
-      externalApisService.getMarketData(address),
+      solanaRpcService.getTopHolders(
+        address,
+        parseFloat(marketData.priceNative.toString()),
+        parseFloat(marketData.price.toString()),
+      ),
     ]);
 
     // 4. Calculate Risk Score — ONLY on-chain rug indicators

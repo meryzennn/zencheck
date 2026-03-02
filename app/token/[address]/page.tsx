@@ -667,13 +667,26 @@ export default function TokenPage({
                               </div>
                             </td>
                             <td className="py-3 text-right">
-                              {holder.tag ? (
-                                <span className="text-xs font-bold text-danger bg-danger/10 px-2 py-0.5 rounded-full border border-danger/20">
-                                  {holder.tag}
+                              {holder.tag === "WHALE" ||
+                              holder.tag === "WHALE ALERT" ? (
+                                <span className="text-xs font-bold text-danger bg-danger/10 px-2 flex items-center justify-end gap-1 w-max ml-auto py-0.5 rounded-full border border-danger/20">
+                                  <span>🐋</span> {holder.tag}
+                                </span>
+                              ) : holder.tag === "FISH" ? (
+                                <span className="text-xs font-bold text-secondary bg-secondary/10 flex items-center justify-end gap-1 w-max ml-auto px-2 py-0.5 rounded-full border border-secondary/20">
+                                  <span>🐟</span> FISH
+                                </span>
+                              ) : holder.tag === "SHRIMP" ? (
+                                <span className="text-xs font-bold text-warning bg-warning/10 flex items-center justify-end gap-1 w-max ml-auto px-2 py-0.5 rounded-full border border-warning/20">
+                                  <span>🦐</span> SHRIMP
+                                </span>
+                              ) : holder.tag === "PLANKTON" ? (
+                                <span className="text-xs font-bold text-text-muted bg-surface-dark flex items-center justify-end gap-1 w-max ml-auto px-2 py-0.5 rounded-full border border-border-dark">
+                                  <span>🦠</span> PLANKTON
                                 </span>
                               ) : (
                                 <span className="text-xs text-text-muted">
-                                  —
+                                  None
                                 </span>
                               )}
                             </td>
@@ -891,7 +904,7 @@ export default function TokenPage({
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">
+                    <p className="text-sm text-white break-words">
                       {activity.description}
                     </p>
                     <span className="text-xs text-text-muted">

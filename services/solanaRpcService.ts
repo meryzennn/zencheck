@@ -63,7 +63,11 @@ export const solanaRpcService = {
     }
   },
 
-  async getTopHolders(address: string) {
+  async getTopHolders(
+    address: string,
+    priceNative?: number,
+    priceUsd?: number,
+  ) {
     try {
       const pubkey = new PublicKey(address);
       const largestAccounts = await connection.getTokenLargestAccounts(pubkey);
@@ -80,13 +84,29 @@ export const solanaRpcService = {
               ? parseFloat(((quantity / totalAmount) * 100).toFixed(2))
               : 0;
 
+          // Calculate value in USD if price is available, otherwise default to 0
+          const valueUsd = priceUsd ? quantity * priceUsd : 0;
+
+          // Determine tier based on USD value
+          let tag = undefined;
+          if (valueUsd > 0) {
+            if (valueUsd >= 10000) tag = "WHALE";
+            else if (valueUsd >= 250) tag = "SHRIMP";
+            else if (valueUsd >= 10) tag = "FISH";
+            else tag = "PLANKTON";
+          } else if (percentage > 20) {
+            // Fallback if price is missing but they own >20%
+            tag = "WHALE ALERT";
+          }
+
           return {
             rank: index + 1,
             address: `${account.address.toString().slice(0, 4)}...${account.address.toString().slice(-4)}`,
             rawAddress: account.address.toString(),
             quantity,
             percentage,
-            tag: percentage > 20 ? "WHALE ALERT" : undefined,
+            valueUsd,
+            tag,
           };
         });
       }
