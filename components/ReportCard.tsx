@@ -17,8 +17,8 @@ function formatPrice(n: number): string {
 }
 
 function getRiskColor(score: number) {
-  if (score <= 30) return { bg: "#22c55e", text: "#dcfce7", label: "SAFE" };
-  if (score <= 60) return { bg: "#eab308", text: "#fef9c3", label: "WARNING" };
+  if (score >= 80) return { bg: "#22c55e", text: "#dcfce7", label: "SAFE" };
+  if (score >= 50) return { bg: "#eab308", text: "#fef9c3", label: "WARNING" };
   return { bg: "#ef4444", text: "#fee2e2", label: "DANGER" };
 }
 
@@ -63,7 +63,7 @@ const ReportCard = forwardRef<HTMLDivElement, ReportCardProps>(
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {(logoBase64 || token.logoUrl) && (
+            {logoBase64 || token.logoUrl ? (
               <img
                 src={logoBase64 || token.logoUrl || ""}
                 alt=""
@@ -72,8 +72,28 @@ const ReportCard = forwardRef<HTMLDivElement, ReportCardProps>(
                   height: 48,
                   borderRadius: "50%",
                   border: "2px solid #a855f7",
+                  objectFit: "cover",
                 }}
+                crossOrigin="anonymous"
               />
+            ) : (
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #a855f7, #ec4899)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#fff",
+                  fontWeight: 900,
+                  fontSize: 24,
+                  border: "2px solid #a855f7",
+                }}
+              >
+                {token.symbol?.[0] || "?"}
+              </div>
             )}
             <div>
               <div
