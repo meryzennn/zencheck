@@ -14,7 +14,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ZenCheck / Solana Token Rug Checker",
+  title: {
+    template: "%s | ZenRugCheck",
+    default: "ZenRugCheck | Solana Token Rug Checker",
+  },
   description:
     "Analyze any Solana token address instantly for liquidity locks, mint authority, and holder distribution risks before you ape in.",
   keywords: [
@@ -24,7 +27,34 @@ export const metadata: Metadata = {
     "crypto",
     "defi",
     "liquidity",
+    "solana rug check",
   ],
+  openGraph: {
+    title: "ZenRugCheck | Solana Token Rug Checker",
+    description:
+      "Analyze any Solana token address instantly for liquidity locks, mint authority, and holder distribution risks before you ape in.",
+    url: "https://zenrugcheck.vercel.app",
+    siteName: "ZenRugCheck",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ZenRugCheck | Solana Token Rug Checker",
+    description:
+      "Analyze any Solana token address instantly for liquidity locks, mint authority, and holder distribution risks before you ape in.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({

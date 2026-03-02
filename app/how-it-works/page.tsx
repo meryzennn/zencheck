@@ -3,11 +3,11 @@ export default function HowItWorksPage() {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24 animate-fade-in">
       <div className="text-center max-w-3xl mx-auto mb-16">
         <h1 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-lg tracking-tight">
-          How <span className="text-primary">ZenCheck</span> Works
+          How <span className="text-primary">ZenRugCheck</span> Works
         </h1>
         <p className="text-lg text-text-secondary leading-relaxed">
-          ZenCheck combines real-time on-chain data with advanced heuristics to
-          protect you from rugpulls and malicious contracts on Solana.
+          ZenRugCheck combines real-time on-chain data with advanced heuristics
+          to protect you from rugpulls and malicious contracts on Solana.
         </p>
       </div>
 
@@ -21,7 +21,7 @@ export default function HowItWorksPage() {
             1. Multi-Node Data Aggregation
           </h3>
           <p className="text-sm text-text-muted leading-relaxed mb-4">
-            ZenCheck doesn&apos;t rely on a single source of truth. We
+            ZenRugCheck doesn&apos;t rely on a single source of truth. We
             simultaneously query <strong>Alchemy RPC nodes</strong> for raw
             Solana blockchain state (Token Supply, Largest Accounts) and{" "}
             <strong>DexScreener API</strong> for off-chain market metrics
@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
             <code className="text-secondary bg-secondary/10 px-1 rounded">
               onAccountChange
             </code>{" "}
-            listener directly to the token&apos;s contract address, ZenCheck
+            listener directly to the token&apos;s contract address, ZenRugCheck
             updates instantly if a developer maliciously revokes or alters
             contract authorities mid-trade.
           </p>
@@ -73,7 +73,7 @@ export default function HowItWorksPage() {
       <div className="glass-panel p-5 border-l-4 border-l-secondary max-w-4xl mx-auto mb-12">
         <h4 className="text-sm font-bold text-secondary mb-2 flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">info</span>
-          What ZenCheck Does NOT Penalize
+          What ZenRugCheck Does NOT Penalize
         </h4>
         <div className="flex flex-wrap gap-3">
           <span className="text-xs bg-surface-dark px-3 py-1 rounded-full border border-border-dark text-text-secondary">
@@ -111,8 +111,8 @@ export default function HowItWorksPage() {
               LP systems (like Meteora DLMMs) that basic scanners flag as
               &quot;Unlocked&quot;. If a token has{" "}
               <strong>&gt;$50M Market Cap</strong> and{" "}
-              <strong>&gt;$2M Liquidity</strong>, ZenCheck skips minor heuristic
-              deductions and locks the score at Verified Safe (100).
+              <strong>&gt;$2M Liquidity</strong>, ZenRugCheck skips minor
+              heuristic deductions and locks the score at Verified Safe (100).
             </p>
           </div>
         </div>

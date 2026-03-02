@@ -4,7 +4,7 @@ import { externalApisService } from "./externalApis";
 import { TokenAnalysis } from "./types";
 
 /**
- * ZenCheck Risk Score Algorithm — True Rug-Pull Detection
+ * ZenRugCheck Risk Score Algorithm — True Rug-Pull Detection
  *
  * This algorithm ONLY evaluates on-chain security factors that indicate
  * whether a token could be a rug-pull. It does NOT penalize for:

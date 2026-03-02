@@ -253,7 +253,7 @@
   margin-bottom: 0.5rem;
 }
 .wallet-adapter-modal-title::after {
-  content: "Connect to ZenCheck\A Securely scan tokens and portfolios";
+  content: "Connect to ZenRugCheck\A Securely scan tokens and portfolios";
   white-space: pre-wrap;
   color: #f8fafc;
   font-size: 1.25rem;

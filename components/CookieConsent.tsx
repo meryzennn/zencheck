@@ -8,7 +8,7 @@ export default function CookieConsent() {
 
   useEffect(() => {
     // Check if user has already consented or declined
-    const hasConsented = localStorage.getItem("zencheck-cookie-consent");
+    const hasConsented = localStorage.getItem("zenrugcheck-cookie-consent");
     if (!hasConsented) {
       // Small delay for a cool slide-in effect when landing
       const timer = setTimeout(() => {
@@ -25,7 +25,7 @@ export default function CookieConsent() {
     // Wait for animation to finish before unmounting
     setTimeout(() => {
       setMounted(false);
-      localStorage.setItem("zencheck-cookie-consent", "accepted");
+      localStorage.setItem("zenrugcheck-cookie-consent", "accepted");
     }, 500);
   };
 
@@ -33,7 +33,7 @@ export default function CookieConsent() {
     setShow(false);
     setTimeout(() => {
       setMounted(false);
-      localStorage.setItem("zencheck-cookie-consent", "declined");
+      localStorage.setItem("zenrugcheck-cookie-consent", "declined");
     }, 500);
   };
 

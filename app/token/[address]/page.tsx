@@ -167,7 +167,7 @@ export default function TokenPage({
         logging: false,
       });
       const link = document.createElement("a");
-      link.download = `zencheck-${token.symbol.toLowerCase()}-${token.address.slice(0, 8)}.png`;
+      link.download = `zenrugcheck-${token.symbol.toLowerCase()}-${token.address.slice(0, 8)}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (err) {

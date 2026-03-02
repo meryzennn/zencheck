@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
               1. Information We Collect
             </h2>
             <p className="mb-4">
-              When you use ZenCheck, we may collect the following types of
+              When you use ZenRugCheck, we may collect the following types of
               information:
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -42,7 +42,7 @@ export default function PrivacyPolicyPage() {
             </h2>
             <p className="mb-4">
               We use the collected information solely for the purpose of
-              providing and improving the ZenCheck service:
+              providing and improving the ZenRugCheck service:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
@@ -65,10 +65,11 @@ export default function PrivacyPolicyPage() {
               3. Third-Party Services
             </h2>
             <p>
-              ZenCheck utilizes third-party APIs, such as DexScreener and public
-              Solana RPC nodes, to fetch market data and blockchain information.
-              While we strive to use reputable providers, we are not responsible
-              for the privacy practices of these third-party services.
+              ZenRugCheck utilizes third-party APIs, such as DexScreener and
+              public Solana RPC nodes, to fetch market data and blockchain
+              information. While we strive to use reputable providers, we are
+              not responsible for the privacy practices of these third-party
+              services.
             </p>
           </section>
 

@@ -458,10 +458,10 @@ const ReportCard = forwardRef<HTMLDivElement, ReportCardProps>(
           }}
         >
           <div style={{ fontSize: 10, color: "#64748b" }}>
-            Generated on {now} • ZenCheck © 2026
+            Generated on {now} • ZenRugCheck © 2026
           </div>
           <div style={{ fontSize: 10, color: "#64748b" }}>
-            zencheck.vercel.app • DYOR — Not financial advice
+            zenrugcheck.vercel.app • DYOR — Not financial advice
           </div>
         </div>
       </div>

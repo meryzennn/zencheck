@@ -123,7 +123,7 @@ export default function Header() {
             </span>
           </div>
           <h2 className="text-white text-xl font-bold tracking-tight transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-secondary">
-            ZenCheck
+            ZenRugCheck
           </h2>
         </Link>
 

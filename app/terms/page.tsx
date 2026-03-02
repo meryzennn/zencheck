@@ -15,7 +15,7 @@ export default function TermsOfServicePage() {
               Disclaimer: Not Financial Advice
             </h3>
             <p className="text-text-primary">
-              The information provided by ZenCheck is for informational and
+              The information provided by ZenRugCheck is for informational and
               educational purposes only. It should not be considered as
               financial, investment, or trading advice. Cryptocurrency markets
               are highly volatile, and you should always conduct your own
@@ -28,7 +28,7 @@ export default function TermsOfServicePage() {
               1. Acceptance of Terms
             </h2>
             <p>
-              By accessing or using the ZenCheck application, you agree to be
+              By accessing or using the ZenRugCheck application, you agree to be
               bound by these Terms of Service. If you do not agree to these
               terms, please do not use our services.
             </p>
@@ -39,7 +39,7 @@ export default function TermsOfServicePage() {
               2. Description of Service
             </h2>
             <p>
-              ZenCheck is a web application that provides analysis, risk
+              ZenRugCheck is a web application that provides analysis, risk
               assessments, and portfolio tracking for tokens on the Solana
               blockchain. We aggregate data from various public sources and
               third-party APIs to generate automated reports.
@@ -52,7 +52,7 @@ export default function TermsOfServicePage() {
             </h2>
             <p className="mb-4">
               While we strive to provide accurate and up-to-date information,
-              ZenCheck does not warrant the completeness, reliability, or
+              ZenRugCheck does not warrant the completeness, reliability, or
               accuracy of the data presented. The blockchain environment is
               dynamic:
             </p>
@@ -77,7 +77,7 @@ export default function TermsOfServicePage() {
               4. Limitation of Liability
             </h2>
             <p>
-              In no event shall ZenCheck, its developers, or affiliates be
+              In no event shall ZenRugCheck, its developers, or affiliates be
               liable for any direct, indirect, incidental, consequential, or
               punitive damages arising out of your use of or inability to use
               the service. You are solely responsible for your own trading
@@ -90,7 +90,7 @@ export default function TermsOfServicePage() {
               5. User Warranties
             </h2>
             <p>
-              By using ZenCheck, you warrant that you understand the inherent
+              By using ZenRugCheck, you warrant that you understand the inherent
               risks associated with decentralized finance (DeFi) and
               cryptocurrencies. You agree not to use the service for any illegal
               or unauthorized purpose.
